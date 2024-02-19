@@ -72,4 +72,23 @@ tasksRouter.put('/:id', auth, async (req: RequestWithUser, res, next) => {
   }
 });
 
+tasksRouter.delete('/:id', auth, async (req: RequestWithUser, res, next) => {
+  try {
+    const taskId = req.params.id;
+    const userId = req.user?._id;
+
+    const task = await Task.findOne({_id: taskId, user: userId});
+
+    if (!task) {
+      return res.status(403).send({error: `You don't have enough rights!!`});
+    }
+
+    await Task.deleteOne({_id: taskId});
+
+    res.send({message: 'Task deleted'});
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default tasksRouter;
